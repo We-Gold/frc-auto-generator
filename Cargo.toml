@@ -1,7 +1,8 @@
 [package]
-name = "rust-maze-solver"
+name = "frc-auto-generator"
 version = "0.0.1"
 edition = "2021"
 
 [dependencies]
 macroquad = "0.3"
+splines = { version = "4.0.3", features = ["glam"] }

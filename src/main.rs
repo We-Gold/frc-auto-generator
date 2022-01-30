@@ -1,62 +1,65 @@
-use macroquad::input::*;
 use macroquad::prelude::*;
 
-struct Circle {
-    pos: Vec2,
-    radius: f32,
-    speed: f32,
-    color: Color,
+const MOUSE_POSITION_BOX_OFFSET: f32 = 18.;
+const BOX_COLOR: Color = Color::new(255., 255., 255., 0.8);
+const FONT_SIZE: u16 = 16;
+const FONT_SCALE: f32 = 1.;
+
+const CIRCLE_RADIUS: f32 = 8.;
+const CIRCLE_COLOR: Color = WHITE;
+
+fn get_mouse_vector() -> Vec2 {
+    let (x, y) = mouse_position();
+
+    return Vec2::new(x, y);
 }
 
-impl Circle {
-    fn translate(&mut self, vec: Vec2) {
-        self.pos += vec;
-    }
+fn draw_mouse_position() {
+    show_mouse(false);
 
-    fn draw(&self) {
-        draw_circle(self.pos.x, self.pos.y, self.radius, self.color);
-    }
+    let mouse: Vec2 = get_mouse_vector();
 
-    fn calculate_velocity(&self, delta_t: f32) -> Vec2 {
-        let mut vel = Vec2::new(0., 0.);
+    // Draw an empty circle to represent the position of the mouse
+    draw_circle_lines(mouse.x, mouse.y, CIRCLE_RADIUS, 3., CIRCLE_COLOR);
 
-        // Check for vertical movement
-        if is_key_down(KeyCode::Up) {
-            vel.y -= self.speed * delta_t;
-        } else if is_key_down(KeyCode::Down) {
-            vel.y += self.speed * delta_t;
-        }
+    // Draw the mouse position (round to one decimal place)
+    let mouse_text = format!("{}, {}", mouse.x, mouse.y);
 
-        // Check for horizontal movement
-        if is_key_down(KeyCode::Left) {
-            vel.x -= self.speed * delta_t;
-        } else if is_key_down(KeyCode::Right) {
-            vel.x += self.speed * delta_t;
-        }
+    let text_size = measure_text(&mouse_text, None, FONT_SIZE, FONT_SCALE);
 
-        return vel;
-    }
+    draw_text(
+        &mouse_text,
+        mouse.x - text_size.width / 2.0,
+        mouse.y + MOUSE_POSITION_BOX_OFFSET + text_size.height,
+        FONT_SIZE.into(),
+        BOX_COLOR,
+    );
+
+    // Draw a box that will contain the mouse position text
+    let box_width = text_size.width + 4.;
+    let box_height = text_size.height + 4.;
+
+    let box_corner = Vec2::new(
+        mouse.x - (box_width / 2.),
+        mouse.y + MOUSE_POSITION_BOX_OFFSET,
+    );
+
+    draw_rectangle_lines(
+        box_corner.x,
+        box_corner.y,
+        box_width,
+        box_height,
+        1.5,
+        BOX_COLOR,
+    );
 }
 
-#[macroquad::main("Moving Circle")]
+#[macroquad::main("FRC Auto Generator")]
 async fn main() {
-    let mut circle = Circle {
-        pos: Vec2::new(screen_width() / 2., screen_height() / 2.),
-        radius: 20.,
-        speed: 200.,
-        color: WHITE,
-    };
-
     loop {
         clear_background(BLACK);
 
-        let delta_t = get_frame_time();
-
-        // Calculate the current circle velocity
-        // and move the circle by that velocity
-        circle.translate(circle.calculate_velocity(delta_t));
-
-        circle.draw();
+        draw_mouse_position();
 
         next_frame().await
     }
