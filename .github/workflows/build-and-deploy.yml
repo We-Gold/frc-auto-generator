@@ -1,0 +1,19 @@
+name: Build and Deploy
+on: [push]
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2.3.1
+
+            - name: Install and Build
+              run: |
+                  rustup target add wasm32-unknown-unknown
+                  cargo build --release --target wasm32-unknown-unknown
+                  cp "./target/wasm32-unknown-unknown/release/frc-auto-generator.wasm" "./dist/frc-auto-generator.wasm"
+            - name: Deploy
+              uses: JamesIves/github-pages-deploy-action@4.1.4
+              with:
+                  branch: gh-pages
+                  folder: dist

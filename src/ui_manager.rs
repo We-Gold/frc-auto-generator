@@ -14,6 +14,7 @@ pub struct UIManager {
 
 impl UIManager {
     pub fn update_ui(&mut self) {
+        // Render a button that when clicked will clear all points
         self.clear_points = root_ui().button(
             Vec2::new(screen_width() - BUTTON_X_OFFSET, BUTTON_Y_OFFSET),
             "Clear",
@@ -21,6 +22,7 @@ impl UIManager {
     }
 
     pub fn clear_points_clicked(&self) -> bool {
+        // Returns whether or not we should clear the points
         self.clear_points
     }
 }

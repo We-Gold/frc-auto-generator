@@ -19,8 +19,10 @@ pub fn draw_mouse_position() {
     // Draw the mouse position (round to one decimal place)
     let mouse_text = format!("{}, {}", mouse.x, mouse.y);
 
+    // Find the dimensions of the text
     let text_size = measure_text(&mouse_text, None, FONT_SIZE, FONT_SCALE);
 
+    // Draw the mouse position info text
     draw_text(
         &mouse_text,
         mouse.x - text_size.width / 2.0,
@@ -32,7 +34,6 @@ pub fn draw_mouse_position() {
     // Draw a box that will contain the mouse position text
     let box_width = text_size.width + 4.;
     let box_height = text_size.height + 4.;
-
     let box_corner = Vec2::new(
         mouse.x - (box_width / 2.),
         mouse.y + MOUSE_POSITION_BOX_OFFSET,
