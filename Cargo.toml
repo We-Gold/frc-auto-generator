@@ -5,4 +5,6 @@ edition = "2021"
 
 [dependencies]
 macroquad = "0.3"
-splines = { version = "4.0.3", features = ["glam"] }
+splines = { version = "4.0.3", features = ["glam", "serde"] }
+serde_json = "1.0"
+serde = "1.0"
