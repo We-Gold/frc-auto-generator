@@ -2,6 +2,8 @@ use macroquad::color::*;
 
 pub const BACKGROUND: Color = BLACK;
 
+pub const CURSOR_THICKNESS: f32 = 3.;
+pub const SELECTED_COLOR: Color = GRAY;
 pub const MOUSE_POSITION_BOX_OFFSET: f32 = 18.;
 pub const BOX_COLOR: Color = Color::new(255., 255., 255., 0.8);
 pub const FONT_SIZE: u16 = 16;

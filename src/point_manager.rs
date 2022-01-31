@@ -8,30 +8,68 @@ use splines::{Interpolation, Key, Spline};
 #[derive(Serialize, Deserialize)]
 pub struct PointManager {
     spline: Spline<f32, Pose>,
+    selected_point: Option<usize>,
 }
 
 impl PointManager {
     pub fn new() -> PointManager {
         return PointManager {
             spline: Spline::from_vec(Vec::new()),
+            selected_point: None,
         };
     }
 
     pub fn add_point(&mut self, point: &Pose) {
+        // Determine the index of the new point
+        let index = self.spline.len();
+
         // Add the point to the spline
-        self.spline.add(Key::new(
-            self.spline.len() as f32,
-            *point,
-            Interpolation::Linear,
-        ))
+        self.spline
+            .add(Key::new(index as f32, *point, Interpolation::Linear));
+
+        // Update the selected point
+        self.set_selected_point(Some(index));
     }
 
-    pub fn remove_last_point(&mut self) {
-        let number_of_points = self.spline.len();
+    pub fn set_selected_point(&mut self, index: Option<usize>) {
+        self.selected_point = index;
+    }
 
-        if number_of_points > 0 {
+    pub fn get_selected_point_index(&self) -> usize {
+        return self.selected_point.unwrap();
+    }
+
+    pub fn remove_selected_point(&mut self) {
+        if self.selected_point != None {
             // Remove the point from the spline
-            self.spline.remove(number_of_points - 1);
+            self.spline.remove(self.get_selected_point_index());
+
+            // Set the selected point to the next least point
+            self.update_selected_point_to_previous();
+        }
+    }
+
+    pub fn update_selected_point_to_previous(&mut self) {
+        if self.selected_point != None {
+            // Set the selected point to the next least point
+            self.set_selected_point(if self.get_selected_point_index() > 0 {
+                Some(self.get_selected_point_index() - 1)
+            } else if self.spline.len() == 0 {
+                None
+            } else {
+                Some(self.spline.len() - 1)
+            });
+        }
+    }
+
+    pub fn update_selected_point_to_next(&mut self) {
+        if self.selected_point != None {
+            // Set the selected point to the next point
+            self.set_selected_point(if self.spline.len() == 0 {
+                None
+            } else {
+                Some((self.get_selected_point_index() + 1) % self.spline.len())
+            });
         }
     }
 
@@ -51,6 +89,14 @@ impl PointManager {
     fn connect_points(point1: &Pose, point2: &Pose) {
         draw_line(point1.x, point1.y, point2.x, point2.y, 2., CIRCLE_COLOR)
     }
+    fn show_selected_point(point: &Pose) {
+        draw_circle(
+            point.x,
+            point.y,
+            CIRCLE_RADIUS - CURSOR_THICKNESS,
+            SELECTED_COLOR,
+        );
+    }
 
     pub fn draw_all_points(&self) {
         for (i, key) in self.spline.into_iter().enumerate() {
@@ -61,6 +107,11 @@ impl PointManager {
             // Draw the point on the screen
             PointManager::draw_point(&key.value);
 
+            if i == self.get_selected_point_index() {
+                PointManager::show_selected_point(&key.value);
+            }
+
+            // TODO connect points to previous
             if i > 0 {
                 // Connect the given points
                 PointManager::connect_points(&key.value, self.get_point(i - 1));
@@ -68,16 +119,16 @@ impl PointManager {
         }
     }
 
-    pub fn get_last_point(&self) -> &Pose {
-        return self.get_point(self.spline.len() - 1);
+    pub fn get_selected_point(&self) -> &Pose {
+        return self.get_point(self.get_selected_point_index());
     }
 
     pub fn get_point(&self, index: usize) -> &Pose {
         return &self.spline.get(index).unwrap().value;
     }
 
-    pub fn get_last_point_mut(&mut self) -> &mut Pose {
-        return self.get_point_mut(self.spline.len() - 1);
+    pub fn get_selected_point_mut(&mut self) -> &mut Pose {
+        return self.get_point_mut(self.get_selected_point_index());
     }
 
     pub fn get_point_mut(&mut self, index: usize) -> &mut Pose {
@@ -85,7 +136,9 @@ impl PointManager {
     }
 
     pub fn remove_all_points(&mut self) {
+        // Reset the state of the point manager
         self.spline = Spline::from_vec(Vec::new());
+        self.selected_point = None;
     }
 
     pub fn to_json(&self) -> String {

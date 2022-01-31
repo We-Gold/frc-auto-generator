@@ -11,10 +11,10 @@ fn check_point_control(point_manager: &mut point_manager::PointManager) {
         point_manager.add_point(&mouse::get_mouse_pose());
     } else if is_key_pressed(KeyCode::Z) {
         // Click z to remove the last point
-        point_manager.remove_last_point();
+        point_manager.remove_selected_point();
     } else if is_key_down(KeyCode::R) {
         // Get the current pose to rotate
-        let current_pose = point_manager.get_last_point_mut();
+        let current_pose = point_manager.get_selected_point_mut();
 
         // Hold R to rotate the poze to mouse position
         current_pose.angle_towards_pose(&mouse::get_mouse_pose());
@@ -41,7 +41,8 @@ async fn main() {
         // Add, remove, or clear points depending on the user input
         if ui_manager.clear_points_clicked() {
             point_manager.remove_all_points();
-        } else if is_key_pressed(KeyCode::E) {
+        } else if is_key_pressed(KeyCode::I) {
+            // Toggle the GUI
             ui_manager.toggle_gui();
         } else if !ui_manager.output_text_selected() {
             check_point_control(&mut point_manager);

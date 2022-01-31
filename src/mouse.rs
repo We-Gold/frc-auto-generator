@@ -14,7 +14,13 @@ pub fn draw_mouse_position() {
     let mouse: Pose = get_mouse_pose();
 
     // Draw an empty circle to represent the position of the mouse
-    draw_circle_lines(mouse.x, mouse.y, CIRCLE_RADIUS, 3., CIRCLE_COLOR);
+    draw_circle_lines(
+        mouse.x,
+        mouse.y,
+        CIRCLE_RADIUS,
+        CURSOR_THICKNESS,
+        CIRCLE_COLOR,
+    );
 
     // Draw the mouse position (round to one decimal place)
     let mouse_text = format!("{}, {}", mouse.x, mouse.y);
