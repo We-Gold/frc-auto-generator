@@ -12,3 +12,8 @@ pub const CIRCLE_COLOR: Color = WHITE;
 
 pub const BUTTON_X_OFFSET: f32 = 80.;
 pub const BUTTON_Y_OFFSET: f32 = 20.;
+
+pub const EDITBOX_X_OFFSET: f32 = 200.;
+pub const EDITBOX_Y_OFFSET: f32 = 20.;
+pub const EDITBOX_WIDTH: f32 = 100.;
+pub const EDITBOX_HEIGHT: f32 = 20.;

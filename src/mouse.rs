@@ -1,17 +1,17 @@
+use crate::constants::*;
+use crate::pose::Pose;
 use macroquad::prelude::*;
 
-use crate::constants::*;
-
-pub fn get_mouse_vector() -> Vec2 {
+pub fn get_mouse_pose() -> Pose {
     let (x, y) = mouse_position();
 
-    return Vec2::new(x, y);
+    return Pose::new(x, y);
 }
 
 pub fn draw_mouse_position() {
     show_mouse(false);
 
-    let mouse: Vec2 = get_mouse_vector();
+    let mouse: Pose = get_mouse_pose();
 
     // Draw an empty circle to represent the position of the mouse
     draw_circle_lines(mouse.x, mouse.y, CIRCLE_RADIUS, 3., CIRCLE_COLOR);
@@ -34,7 +34,7 @@ pub fn draw_mouse_position() {
     // Draw a box that will contain the mouse position text
     let box_width = text_size.width + 4.;
     let box_height = text_size.height + 4.;
-    let box_corner = Vec2::new(
+    let box_corner = Pose::new(
         mouse.x - (box_width / 2.),
         mouse.y + MOUSE_POSITION_BOX_OFFSET,
     );

@@ -1,21 +1,23 @@
 use crate::constants::*;
+use crate::pose::Pose;
 use macroquad::prelude::*;
+use serde::{Deserialize, Serialize};
+use serde_json::{from_str, to_string};
 use splines::{Interpolation, Key, Spline};
 
-pub fn create_point_manager() -> PointManager {
-    PointManager {
-        spline: Spline::from_vec(Vec::new()),
-    }
-}
-
-// TODO create pose class and create a serialization and deserialization for it.
-
+#[derive(Serialize, Deserialize)]
 pub struct PointManager {
-    spline: Spline<f32, Vec2>,
+    spline: Spline<f32, Pose>,
 }
 
 impl PointManager {
-    pub fn add_point(&mut self, point: &Vec2) {
+    pub fn new() -> PointManager {
+        return PointManager {
+            spline: Spline::from_vec(Vec::new()),
+        };
+    }
+
+    pub fn add_point(&mut self, point: &Pose) {
         // Add the point to the spline
         self.spline.add(Key::new(
             self.spline.len() as f32,
@@ -33,10 +35,10 @@ impl PointManager {
         }
     }
 
-    fn draw_point(point: &Vec2) {
+    fn draw_point(point: &Pose) {
         draw_circle(point.x, point.y, CIRCLE_RADIUS, CIRCLE_COLOR);
     }
-    fn connect_points(point1: &Vec2, point2: &Vec2) {
+    fn connect_points(point1: &Pose, point2: &Pose) {
         draw_line(point1.x, point1.y, point2.x, point2.y, 2., CIRCLE_COLOR)
     }
 
@@ -56,7 +58,11 @@ impl PointManager {
         self.spline = Spline::from_vec(Vec::new());
     }
 
-    // pub fn to_json(&self) {
-    //     to_string(&self.spline);
-    // }
+    pub fn to_json(&self) -> String {
+        return to_string(&self).unwrap();
+    }
+
+    pub fn from_json(json: &str) -> PointManager {
+        return from_str(json).unwrap();
+    }
 }
