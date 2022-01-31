@@ -40,7 +40,7 @@ impl UIManager {
         );
 
         self.output_text_hovered = editbox.ui(&mut root_ui(), &mut self.output_text)
-            || (is_in_bounds(
+            || (UIManager::is_in_bounds(
                 get_mouse_pose(),
                 Vec2::new(screen_width() - EDITBOX_X_OFFSET, EDITBOX_Y_OFFSET),
                 Vec2::new(EDITBOX_WIDTH, EDITBOX_HEIGHT),
@@ -64,11 +64,11 @@ impl UIManager {
     pub fn toggle_gui(&mut self) {
         self.show_gui = !self.show_gui;
     }
-}
 
-fn is_in_bounds(pose: Pose, corner: Vec2, dimensions: Vec2) -> bool {
-    return pose.x >= corner.x
-        && pose.y >= corner.y
-        && pose.x <= corner.x + dimensions.x
-        && pose.y <= corner.y + dimensions.y;
+    fn is_in_bounds(pose: Pose, corner: Vec2, dimensions: Vec2) -> bool {
+        return pose.x >= corner.x
+            && pose.y >= corner.y
+            && pose.x <= corner.x + dimensions.x
+            && pose.y <= corner.y + dimensions.y;
+    }
 }

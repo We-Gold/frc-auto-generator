@@ -7,9 +7,20 @@ mod ui_manager;
 
 fn check_point_control(point_manager: &mut point_manager::PointManager) {
     if is_mouse_button_pressed(MouseButton::Left) || is_key_pressed(KeyCode::Space) {
+        // Press space or click to add a point
         point_manager.add_point(&mouse::get_mouse_pose());
     } else if is_key_pressed(KeyCode::Z) {
+        // Click z to remove the last point
         point_manager.remove_last_point();
+    } else if is_key_down(KeyCode::R) {
+        // Get the current pose to rotate
+        let current_pose = point_manager.get_last_point_mut();
+
+        // Hold R to rotate the poze to mouse position
+        current_pose.angle_towards_pose(&mouse::get_mouse_pose());
+
+        // Show the direction of the pose
+        point_manager::PointManager::show_point_direction(current_pose);
     }
 }
 

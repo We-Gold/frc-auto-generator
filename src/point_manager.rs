@@ -35,6 +35,16 @@ impl PointManager {
         }
     }
 
+    pub fn show_point_direction(point: &Pose) {
+        // Create a line of set magnitude in the given direction
+        let (end_x, end_y) = (
+            point.x + POSE_DIRECTION_LENGTH * point.theta.cos(),
+            point.y + POSE_DIRECTION_LENGTH * point.theta.sin(),
+        );
+
+        draw_line(point.x, point.y, end_x, end_y, 4., POSE_DIRECTION_COLOR);
+    }
+
     fn draw_point(point: &Pose) {
         draw_circle(point.x, point.y, CIRCLE_RADIUS, CIRCLE_COLOR);
     }
@@ -44,14 +54,34 @@ impl PointManager {
 
     pub fn draw_all_points(&self) {
         for (i, key) in self.spline.into_iter().enumerate() {
+            // Draw the angle of the point if it has one
+            if key.value.theta != 0. {
+                PointManager::show_point_direction(&key.value);
+            }
             // Draw the point on the screen
             PointManager::draw_point(&key.value);
 
             if i > 0 {
                 // Connect the given points
-                PointManager::connect_points(&key.value, &self.spline.get(i - 1).unwrap().value)
+                PointManager::connect_points(&key.value, self.get_point(i - 1));
             }
         }
+    }
+
+    pub fn get_last_point(&self) -> &Pose {
+        return self.get_point(self.spline.len() - 1);
+    }
+
+    pub fn get_point(&self, index: usize) -> &Pose {
+        return &self.spline.get(index).unwrap().value;
+    }
+
+    pub fn get_last_point_mut(&mut self) -> &mut Pose {
+        return self.get_point_mut(self.spline.len() - 1);
+    }
+
+    pub fn get_point_mut(&mut self, index: usize) -> &mut Pose {
+        return self.spline.get_mut(index).unwrap().value;
     }
 
     pub fn remove_all_points(&mut self) {

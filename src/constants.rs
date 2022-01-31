@@ -10,6 +10,9 @@ pub const FONT_SCALE: f32 = 1.;
 pub const CIRCLE_RADIUS: f32 = 6.;
 pub const CIRCLE_COLOR: Color = WHITE;
 
+pub const POSE_DIRECTION_COLOR: Color = ORANGE;
+pub const POSE_DIRECTION_LENGTH: f32 = 22.;
+
 pub const BUTTON_X_OFFSET: f32 = 80.;
 pub const BUTTON_Y_OFFSET: f32 = 20.;
 
