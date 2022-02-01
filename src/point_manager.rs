@@ -39,6 +39,14 @@ impl PointManager {
         return self.selected_point.unwrap();
     }
 
+    pub fn edit_selected_point(&mut self, point: &Pose) {
+        self.get_selected_point_mut().update_position(point);
+    }
+
+    pub fn rotate_selected_point(&mut self, point: &Pose) {
+        self.get_selected_point_mut().angle_towards_pose(point);
+    }
+
     pub fn remove_selected_point(&mut self) {
         if self.selected_point != None {
             // Remove the point from the spline
@@ -100,6 +108,11 @@ impl PointManager {
 
     pub fn draw_all_points(&self) {
         for (i, key) in self.spline.into_iter().enumerate() {
+            if i + 1 < self.spline.len() {
+                // Connect the given points
+                PointManager::connect_points(&key.value, self.get_point(i + 1));
+            }
+
             // Draw the angle of the point if it has one
             if key.value.theta != 0. {
                 PointManager::show_point_direction(&key.value);
@@ -109,12 +122,6 @@ impl PointManager {
 
             if i == self.get_selected_point_index() {
                 PointManager::show_selected_point(&key.value);
-            }
-
-            // TODO connect points to previous
-            if i > 0 {
-                // Connect the given points
-                PointManager::connect_points(&key.value, self.get_point(i - 1));
             }
         }
     }
