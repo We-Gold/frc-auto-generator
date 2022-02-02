@@ -97,7 +97,7 @@ impl PointManager {
             ));
 
             // Update the selected point
-            self.update_selected_point_to_previous();
+            self.update_selected_point_to_next();
         }
     }
 

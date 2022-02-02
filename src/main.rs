@@ -6,9 +6,6 @@ mod pose;
 mod ui_manager;
 
 fn check_point_control(point_manager: &mut point_manager::PointManager) {
-    // TODO split one point into two interpolated ones
-    // TODO add bezier points
-
     if is_mouse_button_pressed(MouseButton::Left) || is_key_pressed(KeyCode::Space) {
         // Press space or click to add a point
         point_manager.add_point(&mouse::get_mouse_pose());
