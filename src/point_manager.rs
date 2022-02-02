@@ -50,11 +50,60 @@ impl PointManager {
     pub fn remove_selected_point(&mut self) {
         if self.selected_point != None {
             // Remove the point from the spline
-            self.spline.remove(self.get_selected_point_index());
+            self.remove_point(self.get_selected_point_index());
 
             // Set the selected point to the next least point
             self.update_selected_point_to_previous();
         }
+    }
+
+    fn remove_point(&mut self, index: usize) {
+        self.spline.remove(index);
+    }
+
+    pub fn split_selected_point(&mut self) {
+        let selected_index = self.get_selected_point_index();
+
+        // Verify that there are points on both sides of the selected point
+        if selected_index > 0 && selected_index < self.spline.len() - 1 {
+            // Store the time of the selected point
+            let selected_point_time = self.get_point_time(selected_index);
+
+            // Store the previous and next samples
+            let previous_sample_time = self.get_point_time(selected_index - 1);
+            let next_sample_time = self.get_point_time(selected_index + 1);
+
+            // Create splits from the original selected point
+            let split_1_time =
+                PointManager::lerp_two_numbers(previous_sample_time, selected_point_time, 0.66);
+            let split_1_point: &Pose = &self.spline.sample(split_1_time).unwrap();
+            let split_2_time =
+                PointManager::lerp_two_numbers(selected_point_time, next_sample_time, 0.33);
+            let split_2_point: &Pose = &self.spline.sample(split_2_time).unwrap();
+
+            // Remove the old point
+            self.remove_point(selected_index);
+
+            // Add the new points
+            self.spline.add(Key::new(
+                split_1_time,
+                *split_1_point,
+                Interpolation::Linear,
+            ));
+            self.spline.add(Key::new(
+                split_2_time,
+                *split_2_point,
+                Interpolation::Linear,
+            ));
+
+            // Update the selected point
+            self.update_selected_point_to_previous();
+        }
+    }
+
+    fn lerp_two_numbers(num1: f32, num2: f32, t: f32) -> f32 {
+        // Ex: (1, 2, 0.3) -> 1.3
+        return num1 + (num2 - num1) * t;
     }
 
     pub fn update_selected_point_to_previous(&mut self) {
@@ -120,6 +169,7 @@ impl PointManager {
             // Draw the point on the screen
             PointManager::draw_point(&key.value);
 
+            // Highlight the selected point
             if i == self.get_selected_point_index() {
                 PointManager::show_selected_point(&key.value);
             }
@@ -140,6 +190,9 @@ impl PointManager {
 
     pub fn get_point_mut(&mut self, index: usize) -> &mut Pose {
         return self.spline.get_mut(index).unwrap().value;
+    }
+    pub fn get_point_time(&self, index: usize) -> f32 {
+        return self.spline.get(index).unwrap().t;
     }
 
     pub fn remove_all_points(&mut self) {
