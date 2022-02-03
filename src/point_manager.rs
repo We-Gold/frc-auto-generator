@@ -1,4 +1,5 @@
 use crate::constants::*;
+use crate::image_manager::FieldImageManager;
 use crate::pose::Pose;
 use macroquad::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -76,10 +77,15 @@ impl PointManager {
             // Create splits from the original selected point
             let split_1_time =
                 PointManager::lerp_two_numbers(previous_sample_time, selected_point_time, 0.66);
-            let split_1_point: &Pose = &self.spline.sample(split_1_time).unwrap();
+            let split_1_point: &mut Pose = &mut self.spline.sample(split_1_time).unwrap();
             let split_2_time =
                 PointManager::lerp_two_numbers(selected_point_time, next_sample_time, 0.33);
-            let split_2_point: &Pose = &self.spline.sample(split_2_time).unwrap();
+            let split_2_point: &mut Pose = &mut self.spline.sample(split_2_time).unwrap();
+
+            // Carry over the theta value of the original point
+            let theta = self.get_selected_point().theta;
+            split_1_point.theta = theta;
+            split_2_point.theta = theta;
 
             // Remove the old point
             self.remove_point(selected_index);
@@ -155,23 +161,26 @@ impl PointManager {
         );
     }
 
-    pub fn draw_all_points(&self) {
+    pub fn draw_all_points(&self, image_manager: &FieldImageManager) {
         for (i, key) in self.spline.into_iter().enumerate() {
             if i + 1 < self.spline.len() {
                 // Connect the given points
-                PointManager::connect_points(&key.value, self.get_point(i + 1));
+                PointManager::connect_points(
+                    &image_manager.from_field_pose(&key.value),
+                    &image_manager.from_field_pose(self.get_point(i + 1)),
+                );
             }
 
             // Draw the angle of the point if it has one
             if key.value.theta != 0. {
-                PointManager::show_point_direction(&key.value);
+                PointManager::show_point_direction(&image_manager.from_field_pose(&key.value));
             }
             // Draw the point on the screen
-            PointManager::draw_point(&key.value);
+            PointManager::draw_point(&image_manager.from_field_pose(&key.value));
 
             // Highlight the selected point
             if i == self.get_selected_point_index() {
-                PointManager::show_selected_point(&key.value);
+                PointManager::show_selected_point(&image_manager.from_field_pose(&key.value));
             }
         }
     }

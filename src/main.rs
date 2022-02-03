@@ -11,7 +11,8 @@ mod ui_manager;
 async fn main() {
     let mut point_manager = point_manager::PointManager::new();
     let mut ui_manager = ui_manager::UIManager::new();
-    let image_manager = image_manager::ImageManager::new(constants::BACKGROUND_IMAGE_PATH).await;
+    let image_manager =
+        image_manager::FieldImageManager::new(constants::BACKGROUND_IMAGE_PATH).await;
 
     loop {
         clear_background(constants::BACKGROUND);
@@ -20,7 +21,10 @@ async fn main() {
         image_manager.render_image();
 
         // Draw the mouse information
-        mouse::draw_mouse_position();
+        mouse::draw_mouse_position(&image_manager);
+
+        // Draw the mouse cursor
+        mouse::draw_cursor(&image_manager);
 
         // Update the GUI
         ui_manager.update_ui();
@@ -32,11 +36,11 @@ async fn main() {
             // Toggle the GUI
             ui_manager.toggle_gui();
         } else if !ui_manager.output_text_selected() {
-            keyboard_manager::check_point_control(&mut point_manager);
+            keyboard_manager::check_point_control(&mut point_manager, &image_manager);
         }
 
         // Render the points and the lines connecting them
-        point_manager.draw_all_points();
+        point_manager.draw_all_points(&image_manager);
 
         // Update the json output text box
         ui_manager.set_output_text(point_manager.to_json());
