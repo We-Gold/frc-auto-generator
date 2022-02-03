@@ -22,3 +22,5 @@ pub const EDITBOX_X_OFFSET: f32 = 200.;
 pub const EDITBOX_Y_OFFSET: f32 = 20.;
 pub const EDITBOX_WIDTH: f32 = 100.;
 pub const EDITBOX_HEIGHT: f32 = 20.;
+
+pub const BACKGROUND_IMAGE_PATH: &str = "./assets/field_image.png";

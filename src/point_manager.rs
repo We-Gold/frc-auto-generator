@@ -191,6 +191,7 @@ impl PointManager {
     pub fn get_point_mut(&mut self, index: usize) -> &mut Pose {
         return self.spline.get_mut(index).unwrap().value;
     }
+
     pub fn get_point_time(&self, index: usize) -> f32 {
         return self.spline.get(index).unwrap().t;
     }
