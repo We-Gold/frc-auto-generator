@@ -2,9 +2,28 @@ use crate::constants::*;
 use crate::pose::Pose;
 use macroquad::prelude::*;
 
+pub struct FieldImageSize {
+    x: f32,
+    y: f32,
+    width: f32,
+    height: f32,
+}
+
+impl FieldImageSize {
+    pub fn empty() -> FieldImageSize {
+        FieldImageSize {
+            x: 0.,
+            y: 0.,
+            width: 0.,
+            height: 0.,
+        }
+    }
+}
+
 pub struct FieldImageManager {
     texture: Texture2D,
     aspect_ratio: f32,
+    field_size: FieldImageSize,
 }
 
 impl FieldImageManager {
@@ -18,15 +37,18 @@ impl FieldImageManager {
         FieldImageManager {
             texture: texture,
             aspect_ratio: FieldImageManager::calculate_aspect_ratio(image_width, image_height),
+            field_size: FieldImageSize::empty(),
         }
     }
 
-    pub fn render_image(&self) {
-        let (x, y, width, height) = self.calculate_image_size();
+    pub fn calculate_image_dimensions_for_frame(&mut self) {
+        self.field_size = self.calculate_image_size();
+    }
 
+    pub fn render_image(&self) {
         // Store parameters for correctly drawing the image/texture
         let params = DrawTextureParams {
-            dest_size: Some(Vec2::new(width, height)),
+            dest_size: Some(Vec2::new(self.field_size.width, self.field_size.height)),
             source: None,
             rotation: 0.,
             flip_x: false,
@@ -35,14 +57,21 @@ impl FieldImageManager {
         };
 
         // Render the texture
-        draw_texture_ex(self.texture, x, y, GRAY, params);
+        draw_texture_ex(
+            self.texture,
+            self.field_size.x,
+            self.field_size.y,
+            GRAY,
+            params,
+        );
     }
 
     pub fn is_point_in_field(&self, point: &Pose) -> bool {
-        let (x, y, width, height) = self.calculate_image_size();
-
         // Check if the point is within the field.
-        point.x >= x && point.y >= y && point.x <= x + width && point.y <= y + height
+        point.x >= self.field_size.x
+            && point.y >= self.field_size.y
+            && point.x <= self.field_size.x + self.field_size.width
+            && point.y <= self.field_size.y + self.field_size.height
     }
 
     // Source: https://stackoverflow.com/questions/67016985/map-numeric-range-rust
@@ -56,13 +85,16 @@ impl FieldImageManager {
     pub fn to_field_pose(&self, point: &Pose) -> Pose {
         let x = FieldImageManager::map_to_range(
             point.x,
-            (0., screen_width()),
+            (self.field_size.x, self.field_size.x + self.field_size.width),
             (-FIELD_LENGTH / 2., FIELD_LENGTH / 2.),
         );
 
         let y = FieldImageManager::map_to_range(
             point.y,
-            (0., screen_height()),
+            (
+                self.field_size.y,
+                self.field_size.y + self.field_size.height,
+            ),
             (FIELD_WIDTH / 2., -FIELD_WIDTH / 2.),
         );
 
@@ -74,19 +106,22 @@ impl FieldImageManager {
         let x = FieldImageManager::map_to_range(
             point.x,
             (-FIELD_LENGTH / 2., FIELD_LENGTH / 2.),
-            (0., screen_width()),
+            (self.field_size.x, self.field_size.x + self.field_size.width),
         );
 
         let y = FieldImageManager::map_to_range(
             point.y,
             (FIELD_WIDTH / 2., -FIELD_WIDTH / 2.),
-            (0., screen_height()),
+            (
+                self.field_size.y,
+                self.field_size.y + self.field_size.height,
+            ),
         );
 
         Pose::new_with_theta(x, y, point.theta)
     }
 
-    pub fn calculate_image_size(&self) -> (f32, f32, f32, f32) {
+    pub fn calculate_image_size(&self) -> FieldImageSize {
         // Calculate the screen aspect ratio
         let screen_aspect_ratio =
             FieldImageManager::calculate_aspect_ratio(screen_width(), screen_height());
@@ -104,7 +139,12 @@ impl FieldImageManager {
             (screen_height() - height) / 2.,
         );
 
-        return (x, y, width, height);
+        return FieldImageSize {
+            x,
+            y,
+            width,
+            height,
+        };
     }
 
     pub fn calculate_aspect_ratio(width: f32, height: f32) -> f32 {

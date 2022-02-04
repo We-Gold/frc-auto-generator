@@ -140,7 +140,7 @@ impl PointManager {
         // Create a line of set magnitude in the given direction
         let (end_x, end_y) = (
             point.x + POSE_DIRECTION_LENGTH * point.theta.cos(),
-            point.y + POSE_DIRECTION_LENGTH * point.theta.sin(),
+            point.y - POSE_DIRECTION_LENGTH * point.theta.sin(), // Accounts for positive y being downward with the (-)
         );
 
         draw_line(point.x, point.y, end_x, end_y, 4., POSE_DIRECTION_COLOR);

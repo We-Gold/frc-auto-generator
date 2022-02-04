@@ -11,17 +11,22 @@ mod ui_manager;
 async fn main() {
     let mut point_manager = point_manager::PointManager::new();
     let mut ui_manager = ui_manager::UIManager::new();
-    let image_manager =
+    let mut image_manager =
         image_manager::FieldImageManager::new(constants::BACKGROUND_IMAGE_PATH).await;
 
     loop {
         clear_background(constants::BACKGROUND);
 
+        // Calculate the dimensions for the background image
+        image_manager.calculate_image_dimensions_for_frame();
+
         // Render the background image
         image_manager.render_image();
 
         // Draw the mouse information
-        mouse::draw_mouse_position(&image_manager);
+        if image_manager.is_point_in_field(&mouse::get_mouse_pose()) {
+            mouse::draw_mouse_position(&image_manager);
+        }
 
         // Draw the mouse cursor
         mouse::draw_cursor(&image_manager);
