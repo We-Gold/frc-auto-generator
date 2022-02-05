@@ -12,7 +12,6 @@ jobs:
                   rustup target add wasm32-unknown-unknown
                   cargo build --release --target wasm32-unknown-unknown
                   cp "./target/wasm32-unknown-unknown/release/frc-auto-generator.wasm" "./dist/frc-auto-generator.wasm"
-                  mkdir -p "./dist/assets"
                   cp "./assets/field_image.png" "./dist/assets/field_image.png"
                   npm install workbox-cli --global
                   workbox generateSW workbox-config.js
