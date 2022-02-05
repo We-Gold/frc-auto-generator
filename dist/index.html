@@ -24,8 +24,18 @@
 
 <body>
     <canvas id="glcanvas" tabindex='1'></canvas>
-    <script src="https://not-fl3.github.io/miniquad-samples/gl.js"></script>
+    <script src="./gl.js"></script>
     <script>load("./frc-auto-generator.wasm");</script>
+
+    <script>
+        // Verify that service workers are supported
+        if ('serviceWorker' in navigator) {
+            // Use the window load event to keep the page load performant
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js');
+            });
+        }
+    </script>
 </body>
 
 </html>

@@ -14,6 +14,8 @@ jobs:
                   cp "./target/wasm32-unknown-unknown/release/frc-auto-generator.wasm" "./dist/frc-auto-generator.wasm"
                   mkdir -p "./dist/assets"
                   cp "./assets/field_image.png" "./dist/assets/field_image.png"
+                  npm install workbox-cli --global
+                  workbox generateSW workbox-config.js
             - name: Deploy
               uses: JamesIves/github-pages-deploy-action@4.1.4
               with:
